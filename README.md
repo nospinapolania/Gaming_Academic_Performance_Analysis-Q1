@@ -49,7 +49,7 @@ El **Proyecto 2** se construira despues usando las vistas SQL ya preparadas para
 
 ---
 
-## Blueprint del Dashboard - Proyecto 2
+## Dashboard en Power BI - Proyecto 2
 
 | Pagina | Nombre | Pregunta que responde |
 |--------|--------|-----------------------|
@@ -61,8 +61,8 @@ El **Proyecto 2** se construira despues usando las vistas SQL ya preparadas para
 <br/>
 
 <div align="center">
-<img src="assets/dashboard_preview.svg" alt="Dashboard Preview" width="90%"/>
-<br/><sub><i>Blueprint visual para la siguiente fase en Power BI - Paleta academica navy #102A43, teal #2EC4B6 y amber #FFB703</i></sub>
+<img src="assets/dashboard_executive.png" alt="Captura real de la pagina Executive del dashboard en Power BI" width="100%"/>
+<br/><sub><i>Captura real de la pagina Executive en Power BI: indicadores, habitos de gaming y estudio, correlaciones y segmentos de riesgo.</i></sub>
 </div>
 
 ---
@@ -242,7 +242,6 @@ Gaming_Academic_Performance_Analysis-Q1/
 |
 |-- assets/
 |   |-- header_banner.svg
-|   `-- dashboard_preview.svg
 |
 |-- .gitignore
 `-- README.md
