@@ -1,0 +1,128 @@
+table vw_behavior_dashboard
+	lineageTag: 12c91689-7ec0-4dd6-8525-efab63cec566
+
+	column gender
+		dataType: string
+		lineageTag: f0744f1a-de64-4bdb-b9e8-5d99f18d2d7d
+		summarizeBy: none
+		sourceColumn: gender
+
+		annotation SummarizationSetBy = Automatic
+
+	column gaming_genre
+		dataType: string
+		lineageTag: ea534d9b-caff-4c26-a580-6960503d9431
+		summarizeBy: none
+		sourceColumn: gaming_genre
+
+		annotation SummarizationSetBy = Automatic
+
+	column stress_level
+		dataType: string
+		lineageTag: c1abb06d-b07f-44f1-884d-05521fedbe07
+		summarizeBy: none
+		sourceColumn: stress_level
+
+		annotation SummarizationSetBy = Automatic
+
+	column gaming_band
+		dataType: string
+		lineageTag: eb451ab7-46b1-48cb-a225-f795227ca851
+		summarizeBy: none
+		sourceColumn: gaming_band
+
+		annotation SummarizationSetBy = Automatic
+
+	column students
+		dataType: int64
+		formatString: 0
+		lineageTag: f156c66b-e6d3-414d-9d14-4564c12dbad9
+		summarizeBy: sum
+		sourceColumn: students
+
+		annotation SummarizationSetBy = Automatic
+
+	column avg_grade
+		dataType: double
+		lineageTag: 84c5c469-b2dd-4f14-a108-1a0998c1b92a
+		summarizeBy: sum
+		sourceColumn: avg_grade
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column avg_study_hours
+		dataType: double
+		lineageTag: d7e89f87-bf19-42ce-8576-3df14465060b
+		summarizeBy: sum
+		sourceColumn: avg_study_hours
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column avg_sleep_hours
+		dataType: double
+		lineageTag: 61127602-7d17-4ccb-a787-06cc720da6cd
+		summarizeBy: sum
+		sourceColumn: avg_sleep_hours
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column avg_attendance
+		dataType: double
+		lineageTag: 1bffcdb9-a1f0-419e-a735-047f3f1509c7
+		summarizeBy: sum
+		sourceColumn: avg_attendance
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column avg_device_usage
+		dataType: double
+		lineageTag: 7ca603da-a37b-4c53-bd9c-ffb49b28b99b
+		summarizeBy: sum
+		sourceColumn: avg_device_usage
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column avg_addiction_score
+		dataType: double
+		lineageTag: 294715a7-ce71-440f-950a-c692c18ab2f2
+		summarizeBy: sum
+		sourceColumn: avg_addiction_score
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column at_risk_pct
+		dataType: double
+		lineageTag: 43629234-aa2f-4235-b249-88687f997966
+		summarizeBy: sum
+		sourceColumn: at_risk_pct
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition vw_behavior_dashboard = m
+		mode: import
+		source =
+				let
+				    Origen = Odbc.DataSource("dsn=mysql_powerbi", [HierarchicalNavigation=true]),
+				    repositorios_Database = Origen{[Name="repositorios",Kind="Database"]}[Data],
+				    vw_behavior_dashboard_View = repositorios_Database{[Name="vw_behavior_dashboard",Kind="View"]}[Data]
+				in
+				    vw_behavior_dashboard_View
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

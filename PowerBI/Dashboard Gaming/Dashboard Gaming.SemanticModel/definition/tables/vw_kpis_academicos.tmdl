@@ -1,0 +1,116 @@
+table vw_kpis_academicos
+	lineageTag: e1052eb8-895d-48d2-9d29-c3263a75c8f1
+
+	column total_students
+		dataType: int64
+		formatString: 0
+		lineageTag: 809f8fbf-841f-4a63-b1de-538c85613ff6
+		summarizeBy: sum
+		sourceColumn: total_students
+
+		annotation SummarizationSetBy = Automatic
+
+	column avg_grade
+		dataType: double
+		lineageTag: 2be3cabe-9c53-4a4a-96a9-3f9ddc66f111
+		summarizeBy: sum
+		sourceColumn: avg_grade
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column avg_gaming_hours
+		dataType: double
+		lineageTag: 3a0ba31b-ab48-4708-8b00-58ac823ff6b2
+		summarizeBy: sum
+		sourceColumn: avg_gaming_hours
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column avg_study_hours
+		dataType: double
+		lineageTag: baf07e67-d52d-4c1b-b9b7-1980d64a69d0
+		summarizeBy: sum
+		sourceColumn: avg_study_hours
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column avg_sleep_hours
+		dataType: double
+		lineageTag: d4b27f90-3702-444f-b0e8-a9668c24914d
+		summarizeBy: sum
+		sourceColumn: avg_sleep_hours
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column avg_attendance
+		dataType: double
+		lineageTag: 271ae52a-4776-4ca0-960e-d9f2617ab2c9
+		summarizeBy: sum
+		sourceColumn: avg_attendance
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column at_risk_students
+		dataType: double
+		lineageTag: 6c9eae0a-4601-445f-94f8-e2e8c35b443f
+		summarizeBy: sum
+		sourceColumn: at_risk_students
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column at_risk_pct
+		dataType: double
+		lineageTag: 8cd66b10-46c6-4b56-8ade-04279445c799
+		summarizeBy: sum
+		sourceColumn: at_risk_pct
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column excellent_students
+		dataType: double
+		lineageTag: ab37da76-1219-48eb-ae0f-5b39969b0253
+		summarizeBy: sum
+		sourceColumn: excellent_students
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column excellent_pct
+		dataType: double
+		lineageTag: 5d4a9aff-d071-4d00-8657-42a27aaf1f46
+		summarizeBy: sum
+		sourceColumn: excellent_pct
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition vw_kpis_academicos = m
+		mode: import
+		source =
+				let
+				    Origen = Odbc.DataSource("dsn=mysql_powerbi", [HierarchicalNavigation=true]),
+				    repositorios_Database = Origen{[Name="repositorios",Kind="Database"]}[Data],
+				    vw_kpis_academicos_View = repositorios_Database{[Name="vw_kpis_academicos",Kind="View"]}[Data]
+				in
+				    vw_kpis_academicos_View
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

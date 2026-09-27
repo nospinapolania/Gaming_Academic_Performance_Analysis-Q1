@@ -1,0 +1,493 @@
+table vw_student_segments
+	lineageTag: 29af97a8-2586-44fb-b524-f6a77f289bb3
+
+	measure total_students = COALESCE(DISTINCTCOUNT('vw_student_segments'[student_id]), 0)
+		formatString: #,0
+		displayFolder: Dashboard
+		lineageTag: c4ae2ad9-63a3-4d76-8ba2-08fdd41305d6
+
+		changedProperty = IsHidden
+
+	measure grade_average =
+			
+			AVERAGE('vw_student_segments'[grades])
+		formatString: 0.00
+		displayFolder: Dashboard
+		lineageTag: 645f76c2-721f-4161-b679-7dca5577f126
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure at_risk_students = COALESCE(CALCULATE(DISTINCTCOUNT('vw_student_segments'[student_id]), KEEPFILTERS('vw_student_segments'[grades] < 60)), 0)
+		formatString: #,0
+		displayFolder: Dashboard
+		lineageTag: 89fc5102-87c8-4a6d-bf0b-575bd3547a18
+
+		changedProperty = IsHidden
+
+	measure at_risk_pct =
+			
+			DIVIDE(
+			    [at_risk_students],
+			    [total_students]
+			)
+		formatString: 0.0%
+		displayFolder: Dashboard
+		lineageTag: 2c9f3c6d-f2cc-4967-bd6f-ffd9aab08e47
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure excellent_students = COALESCE(CALCULATE(DISTINCTCOUNT('vw_student_segments'[student_id]), KEEPFILTERS('vw_student_segments'[grades] >= 90)), 0)
+		formatString: #,0
+		displayFolder: Dashboard
+		lineageTag: a751dad6-636e-4ad8-bb76-f6460bdd525c
+
+		changedProperty = IsHidden
+
+	measure excellent_pct =
+			
+			DIVIDE(
+			    [excellent_students],
+			    [total_students]
+			)
+		formatString: 0.0%
+		displayFolder: Dashboard
+		lineageTag: ed5aee0e-38ed-4ddc-8941-0ad1c815059f
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure average_gaming_hours =
+			
+			AVERAGE('vw_student_segments'[gaming_hours])
+		formatString: 0.00
+		displayFolder: Dashboard
+		lineageTag: 90f40f74-f4d3-4c3b-8660-13a3ee733bb1
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure average_study_hours =
+			
+			AVERAGE('vw_student_segments'[study_hours])
+		formatString: 0.00
+		displayFolder: Dashboard
+		lineageTag: 79d7d755-5160-4cdf-bdf7-3883763fa2c9
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure average_sleep_hours =
+			
+			AVERAGE('vw_student_segments'[sleep_hours])
+		formatString: 0.00
+		displayFolder: Dashboard
+		lineageTag: 26b57823-9e4a-46c1-98f7-6c9c3061f4da
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure average_attendance =
+			
+			AVERAGE('vw_student_segments'[attendance])
+		formatString: 0.00
+		displayFolder: Dashboard
+		lineageTag: 25cf518a-ea7a-48e5-8c8a-aeb36fd0ec9c
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure average_addiction_score =
+			
+			AVERAGE('vw_student_segments'[addiction_score])
+		formatString: 0.00
+		displayFolder: Dashboard
+		lineageTag: b64e7d6c-8003-4f5a-bb71-a131147ae0c5
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure average_device_usage =
+			
+			AVERAGE('vw_student_segments'[device_usage])
+		formatString: 0.00
+		displayFolder: Dashboard
+		lineageTag: 6295df77-e384-46b1-b855-d0ba072cd35d
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure average_reaction_time =
+			
+			AVERAGE('vw_student_segments'[reaction_time_ms])
+		formatString: 0.00
+		displayFolder: Dashboard
+		lineageTag: 488c1daf-19ec-44b1-998f-744940801ee1
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Pearson correlation calculated from students in the current filter context. Blank for fewer than two valid pairs or zero variance.
+	measure correlation_grade =
+			VAR chosen_variable = SELECTEDVALUE('correlation_with_grades'[variable])
+			VAR pairs = FILTER(
+			    SELECTCOLUMNS('vw_student_segments',
+			        "x_value", SWITCH(chosen_variable,
+			            "Study", 'vw_student_segments'[study_hours],
+			            "Sleep", 'vw_student_segments'[sleep_hours],
+			            "Attendance", 'vw_student_segments'[attendance],
+			            "Gaming", 'vw_student_segments'[gaming_hours],
+			            "Addiction", 'vw_student_segments'[addiction_score]),
+			        "y_value", 'vw_student_segments'[grades]),
+			    NOT ISBLANK([x_value]) && NOT ISBLANK([y_value]))
+			VAR mean_x = AVERAGEX(pairs, [x_value])
+			VAR mean_y = AVERAGEX(pairs, [y_value])
+			VAR numerator = SUMX(pairs, ([x_value] - mean_x) * ([y_value] - mean_y))
+			VAR denominator = SQRT(SUMX(pairs, POWER([x_value] - mean_x, 2)) * SUMX(pairs, POWER([y_value] - mean_y, 2)))
+			RETURN IF(COUNTROWS(pairs) < 2, BLANK(), DIVIDE(numerator, denominator))
+		formatString: 0.000
+		displayFolder: Dashboard
+		lineageTag: 675c3f49-0a62-48b5-931d-10a09e0390b5
+
+	column student_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 2fa10a67-7bda-41e4-b775-9ae1a3af3283
+		summarizeBy: none
+		sourceColumn: student_id
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column age
+		dataType: int64
+		formatString: 0
+		lineageTag: 1ef0fb1f-7bdf-461b-83db-3a6ed49e508d
+		summarizeBy: sum
+		sourceColumn: age
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column gender
+		dataType: string
+		lineageTag: 8b7d759c-bc27-4b4b-ba70-2c3ef6e565e5
+		summarizeBy: none
+		sourceColumn: gender
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column gaming_genre
+		dataType: string
+		lineageTag: cf899216-7315-4d9c-a02c-922ee398ebe8
+		summarizeBy: none
+		sourceColumn: gaming_genre
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column stress_level
+		dataType: string
+		lineageTag: 0abf2718-38d3-46a1-8de0-06dd09c5e0db
+		summarizeBy: none
+		sourceColumn: stress_level
+		sortByColumn: stress_level_order
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column gaming_hours
+		dataType: double
+		lineageTag: 8cdffdf6-3b1a-404f-971c-1f5ade549940
+		summarizeBy: sum
+		sourceColumn: gaming_hours
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column study_hours
+		dataType: double
+		lineageTag: 86ea4ace-9083-4a4a-baac-16297221d5d5
+		summarizeBy: sum
+		sourceColumn: study_hours
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column sleep_hours
+		dataType: double
+		lineageTag: ff3fcb57-d8bb-4789-8e55-7db00881b6e1
+		summarizeBy: sum
+		sourceColumn: sleep_hours
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column attendance
+		dataType: double
+		lineageTag: cafe59d0-4d40-46ca-829e-1c3a6d0b6732
+		summarizeBy: sum
+		sourceColumn: attendance
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column social_activity
+		dataType: double
+		lineageTag: 9b969767-76ef-4822-a07c-86665baed12e
+		summarizeBy: sum
+		sourceColumn: social_activity
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column device_usage
+		dataType: double
+		lineageTag: e6f73206-6fd7-406d-beb2-f5c015456081
+		summarizeBy: sum
+		sourceColumn: device_usage
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column reaction_time_ms
+		dataType: double
+		lineageTag: 4e29ea5f-344d-4d32-908b-3bcf3a214456
+		summarizeBy: sum
+		sourceColumn: reaction_time_ms
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column addiction_score
+		dataType: double
+		lineageTag: 87cbf98d-73dd-4592-a7ee-fe5aa74385f8
+		summarizeBy: sum
+		sourceColumn: addiction_score
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column grades
+		dataType: double
+		lineageTag: efeae646-117f-4391-b5ec-7edf77d30c30
+		summarizeBy: sum
+		sourceColumn: grades
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column gaming_band
+		dataType: string
+		lineageTag: 97e6d054-4d3e-4875-8d30-027e6aed992e
+		summarizeBy: none
+		sourceColumn: gaming_band
+		sortByColumn: gaming_band_order
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column study_band
+		dataType: string
+		lineageTag: 1982f2d8-a5db-49a2-87c6-9d44427d5c80
+		summarizeBy: none
+		sourceColumn: study_band
+		sortByColumn: study_band_order
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column sleep_band
+		dataType: string
+		lineageTag: 84481c20-3e9b-45a8-aa5f-37fc8f168ee6
+		summarizeBy: none
+		sourceColumn: sleep_band
+		sortByColumn: sleep_band_order
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column performance_band
+		dataType: string
+		lineageTag: fce641a0-f7df-48c1-8d4c-423a9f9f27d6
+		summarizeBy: none
+		sourceColumn: performance_band
+		sortByColumn: performance_band_order
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column risk_flag
+		dataType: string
+		lineageTag: 52e11913-05ce-49fd-8039-265eaf83818f
+		summarizeBy: none
+		sourceColumn: risk_flag
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_at_risk
+		dataType: int64
+		formatString: 0
+		lineageTag: 86e7da8e-3a74-4102-9dbd-5a68d866cb1e
+		summarizeBy: sum
+		sourceColumn: is_at_risk
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_excellent
+		dataType: int64
+		formatString: 0
+		lineageTag: f68d4c52-e4af-4ee0-8ead-2bbea9d65574
+		summarizeBy: sum
+		sourceColumn: is_excellent
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column attendance_band = IF(ISBLANK([attendance]), BLANK(), IF([attendance] < 75, "Below 75%", "75% or above"))
+		dataType: string
+		lineageTag: 79bfe009-2432-4262-868d-8f3e30c8d48c
+		summarizeBy: none
+		sortByColumn: attendance_band_order
+
+	column attendance_band_order = IF(ISBLANK([attendance]), 99, IF([attendance] < 75, 1, 2))
+		dataType: int64
+		isHidden
+		lineageTag: 1ce9e608-44ac-4381-abd0-f01966c41b5c
+		summarizeBy: none
+
+	/// Four equal-size groups at refresh, ordered by reaction time then student_id to break ties. Q1 is fastest. Groups stay fixed when filtering.
+	column reaction_quartile =
+			VAR current_time = [reaction_time_ms]
+			VAR current_id = [student_id]
+			VAR valid_students = FILTER(ALL('vw_student_segments'[reaction_time_ms], 'vw_student_segments'[student_id]), NOT ISBLANK('vw_student_segments'[reaction_time_ms]))
+			VAR row_position = COUNTROWS(FILTER(valid_students,
+			    'vw_student_segments'[reaction_time_ms] < current_time ||
+			    ('vw_student_segments'[reaction_time_ms] = current_time && 'vw_student_segments'[student_id] <= current_id)))
+			VAR total_rows = COUNTROWS(valid_students)
+			VAR small_size = INT(total_rows / 4)
+			VAR extra_groups = MOD(total_rows, 4)
+			VAR large_rows = (small_size + 1) * extra_groups
+			RETURN IF(ISBLANK(current_time), BLANK(),
+			    IF(row_position <= large_rows,
+			        ROUNDUP(DIVIDE(row_position, small_size + 1), 0),
+			        extra_groups + ROUNDUP(DIVIDE(row_position - large_rows, small_size), 0)))
+		dataType: int64
+		formatString: "Q"0
+		lineageTag: e284fe04-c08f-4a92-b685-8e6bf34aca30
+		summarizeBy: none
+
+	column gaming_band_order
+		dataType: int64
+		isHidden
+		lineageTag: 55d1e891-8fd0-4943-a114-ab6b4b06befc
+		summarizeBy: none
+		sourceColumn: gaming_band_order
+
+	column study_band_order
+		dataType: int64
+		isHidden
+		lineageTag: 135e7b68-6bda-4442-a7a6-f9ec835133a4
+		summarizeBy: none
+		sourceColumn: study_band_order
+
+	column sleep_band_order
+		dataType: int64
+		isHidden
+		lineageTag: 39d9baf0-f4b9-4f9b-b476-e4f06c3dfbf4
+		summarizeBy: none
+		sourceColumn: sleep_band_order
+
+	column stress_level_order
+		dataType: int64
+		isHidden
+		lineageTag: 7197562f-bb5d-4297-a4fb-b6013cf24e8f
+		summarizeBy: none
+		sourceColumn: stress_level_order
+
+	column performance_band_order
+		dataType: int64
+		isHidden
+		lineageTag: c8e073f8-5709-420e-be46-a9bb7c5bc5d6
+		summarizeBy: none
+		sourceColumn: performance_band_order
+
+	partition vw_student_segments = m
+		mode: import
+		source =
+				let
+				    SourceTable = (
+				let
+				    Origen = Odbc.DataSource("dsn=mysql_powerbi", [HierarchicalNavigation=true]),
+				    repositorios_Database = Origen{[Name="repositorios",Kind="Database"]}[Data],
+				    vw_student_segments_View = repositorios_Database{[Name="vw_student_segments",Kind="View"]}[Data]
+				in
+				    vw_student_segments_View
+				    ),
+				    AddedOrder1 = Table.AddColumn(SourceTable, "gaming_band_order", each let position = List.PositionOf({"0-2h", "2-4h", "4-6h", "6-8h"}, [gaming_band]) in if position < 0 then 99 else position + 1, Int64.Type),
+				    AddedOrder2 = Table.AddColumn(AddedOrder1, "study_band_order", each let position = List.PositionOf({"1-3h", "3-6h", "6-8h", "8-10h"}, [study_band]) in if position < 0 then 99 else position + 1, Int64.Type),
+				    AddedOrder3 = Table.AddColumn(AddedOrder2, "sleep_band_order", each let position = List.PositionOf({"<5h", "5-7h", "7-8h", "8h+"}, [sleep_band]) in if position < 0 then 99 else position + 1, Int64.Type),
+				    AddedOrder4 = Table.AddColumn(AddedOrder3, "stress_level_order", each let position = List.PositionOf({"Low", "Medium", "High"}, [stress_level]) in if position < 0 then 99 else position + 1, Int64.Type),
+				    AddedOrder5 = Table.AddColumn(AddedOrder4, "performance_band_order", each let position = List.PositionOf({"At Risk", "Regular", "Solid", "Excellent"}, [performance_band]) in if position < 0 then 99 else position + 1, Int64.Type)
+				in
+				    AddedOrder5
+
+	changedProperty = IsHidden
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,41 @@
+table correlation_with_grades
+	lineageTag: d53fbc2b-0d36-4980-83e0-1aab725c61bc
+
+	column variable
+		lineageTag: da8d8f8f-791a-4faf-b31a-c567b79d321c
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [variable]
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Legacy reference values; dashboard uses the dynamic correlation_grade measure.
+	column correlation
+		isHidden
+		lineageTag: 5baab705-31cd-4c27-9c98-7afd5dd53233
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [correlation]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition correlation_with_grades = calculated
+		mode: import
+		source =
+				
+				DATATABLE(
+				    "variable", STRING,
+				    "correlation", DOUBLE,
+				    {
+				        {"Study", 0.733},
+				        {"Sleep", 0.249},
+				        {"Attendance", 0.130},
+				        {"Gaming", -0.552},
+				        {"Addiction", -0.497}
+				    }
+				)
+
+	annotation PBI_Id = 684f7f9366a744358cfb52e14e536e9b
+

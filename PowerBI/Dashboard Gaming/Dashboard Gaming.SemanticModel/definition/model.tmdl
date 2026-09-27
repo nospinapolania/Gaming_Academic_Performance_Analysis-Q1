@@ -1,0 +1,21 @@
+model Model
+	culture: es-MX
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: es-CO
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["vw_behavior_dashboard","vw_kpis_academicos","vw_student_segments"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table vw_behavior_dashboard
+ref table vw_kpis_academicos
+ref table vw_student_segments
+ref table correlation_with_grades
+
+ref cultureInfo es-MX
+
